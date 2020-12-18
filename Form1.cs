@@ -22,18 +22,17 @@ namespace lab_oop_6
         Storage storag = new Storage(k);
         static int index = 0;
         int indexin = 0;
+        int figure_now = 0;
 
-        class Circle
+        class Figure
         {
-            public int x, y;
-            public int rad = 15;
             public Color color = Color.Navy;
-            public bool is_drawed = true;
-            public Circle()
-            {
-                x = 0;
-                y = 0;
-            }
+            public Color fillcolor = Color.White;
+        }
+        class Circle : Figure
+        {
+            public int x, y; // Координаты круга
+            public int rad = 30; // Радиус круга
             public Circle(int x, int y)
             {
                 this.x = x - rad;
@@ -43,22 +42,47 @@ namespace lab_oop_6
             ~Circle() { }
         }
 
+        class Line : Figure
+        {
+            public int x, y;
+            public int lenght = 60;
+            public int wight = 5;
+            public Line(int x, int y)
+            {
+                this.x = x - lenght / 2;
+                this.y = y;
+            }
+        }
+
+        class Square : Figure
+        {
+            public int x, y, width, height;
+            public int size = 60;
+            public Square(int x, int y)
+            {
+                this.x = x - size / 2;
+                this.y = y - size / 2;
+                this.width = size;
+                this.height = size;
+            }
+        }
+
         class Storage
         {
-            public Circle[] objects;
+            public Figure[] objects;
             public Storage(int count)
             {
-                objects = new Circle[count];
+                objects = new Figure[count];
                 for (int i = 0; i < count; ++i)
                     objects[i] = null;
             }
             public void initialisat(int count)
             {//выделяем место
-                objects = new Circle[count];
+                objects = new Figure[count];
                 for (int i = 0; i < count; ++i)
                     objects[i] = null;
             }
-            public void add_object(int ind, ref Circle object1, int count, ref int indexin)
+            public void add_object(int ind, ref Figure object1, int count, ref int indexin)
             {//добавляет объект
                 while (objects[ind] != null)
                 {//если ячейка занята, ищем новое место
@@ -87,7 +111,7 @@ namespace lab_oop_6
                         ++count_occupied;
                 return count_occupied;
             }
-            public void doubleSize(ref int size)
+            public void increase(ref int size)
             {//расширение хранилища
                 Storage storage1 = new Storage(size + 10);
                 for (int i = 0; i < size; ++i)
@@ -101,46 +125,52 @@ namespace lab_oop_6
                 for (int i = 0; i < size; ++i)
                     objects[i] = storage1.objects[i];
             }
-
-
-
             ~Storage() { }
         };
 
-        private void paint_circle(Color name, ref Storage stg, int index)
+        private void paint_figure(Color name, ref Storage stg, int index)
         {//рисуем круг на панели
             Pen pen = new Pen(name, 3);
-
+            SolidBrush figurefillcolor;
             if (!storag.check_empty(index))
             {
-                if (storag.objects[index].is_drawed == true)
-                {
+                figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
+                if (storag.objects[index] as Circle != null)
+                {// Если в хранилище круг
+                    Circle circle = stg.objects[index] as Circle;
                     paint_box.CreateGraphics().DrawEllipse(
-                    pen,
-                    stg.objects[index].x,
-                    stg.objects[index].y,
-                    stg.objects[index].rad * 2,
-                    stg.objects[index].rad * 2);
-                    stg.objects[index].color = name;
+                    pen, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
+                    paint_box.CreateGraphics().FillEllipse(
+                        figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
+                }
+                else if (stg.objects[index] as Line != null)
+                {   // Если в хранилище линия
+                    Line line = stg.objects[index] as Line;
+                    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
+                                            line.y, line.lenght, line.wight);
+                    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
+                        line.y, line.lenght, line.wight);
                 }
             }
         }
 
-        private void button_show_Click(object sender, EventArgs e)
-        {
-            paint_box.Refresh();
-            if (storag.occupied(k) != 0)
-            {
-                for (int i = 0; i < k; ++i)
-                {
-                    if (!storag.check_empty(i))
-                    {
-                        storag.objects[i].is_drawed = true;
-                    }
-                    paint_circle(Color.Navy, ref storag, i);
-                }
-            }
-        }
+        //private void drawellipse_Click(object sender, EventArgs e)
+        //{
+        //    //drawline.Checked = false;
+        //    //figure_now = 1;
+        //    //if (drawellipse.Checked == false) // Если не выбрана фигура
+        //    //    figure_now = 0;
+        //}
+
+        //private void drawline_Click(object sender, EventArgs e)
+        //{
+        //    //drawellipse.Checked = false;
+        //    //figure_now = 2;
+        //    //if (drawline.Checked == false) // Если не выбрана фигура
+        //    //    figure_now = 0;
+        //}
+
+
 
         private void button_deletestorage_Click(object sender, EventArgs e)
         {
@@ -149,6 +179,7 @@ namespace lab_oop_6
                 storag.objects[i] = null;
             }
             index = 0;
+
         }
 
         private void button_del__item_storage_Click(object sender, EventArgs e)
@@ -159,20 +190,7 @@ namespace lab_oop_6
             {
                 for (int i = 0; i < k; ++i)
                 {
-                    paint_circle(Color.Navy, ref storag, i);
-                }
-            }
-        }
-
-        private void button_clear_paintbox_Click(object sender, EventArgs e)
-        {
-            paint_box.Invalidate();
-            paint_box.Refresh();
-            for (int i = 0; i < k; ++i)
-            {
-                if (!storag.check_empty(i))
-                {
-                    storag.objects[i].is_drawed = false;
+                    paint_figure(Color.Navy, ref storag, i);
                 }
             }
         }
@@ -191,47 +209,73 @@ namespace lab_oop_6
             }
         }
 
+
+
+
+
+
+
+
+
         private void paint_box_MouseClick(object sender, MouseEventArgs e)
         {
             //проверка на наличие круга на данных координатах
-            int c = check_circle(ref storag, k, e.X - 15, e.Y - 15);
+            int c = check_figure(ref storag, k, e.X - 15, e.Y - 15);
             if (index == k)
-                storag.doubleSize(ref k);
+                storag.increase(ref k);
             if (c != -1)
             {//круг уже есть
                 if (Control.ModifierKeys == Keys.Control)
                 {//если нажат, выделяем несколько объектов
                     if (p == 0)
                     {
-                        paint_circle(Color.Navy, ref storag, indexin);
+                        paint_figure(Color.Navy, ref storag, indexin);
                         p = 1;
                     }
-                    paint_circle(Color.Red, ref storag, c);
+                    paint_figure(Color.Red, ref storag, c);
                 }
                 else
                 {//иначе только один объект
                     remove_selection_circle(ref storag);
 
-                    paint_circle(Color.Red, ref storag, c);
+                    paint_figure(Color.Red, ref storag, c);
                 }
                 return;
             }
             else
             {//круга нет
-                Circle krug = new Circle(e.X, e.Y);
-
-                storag.add_object(index, ref krug, k, ref indexin);
+                Figure figure = new Figure();
+                switch (figure_now)
+                {   // В зависимости какая фигура выбрана
+                    case 0:
+                        return;
+                    case 1:
+                        figure = new Circle(e.X, e.Y);
+                        break;
+                    case 2:
+                        figure = new Line(e.X, e.Y);
+                        break;
+                }
+                storag.add_object(index, ref figure, k, ref indexin);
 
                 remove_selection_circle(ref storag);
 
-                paint_circle(Color.Red, ref storag, indexin);
+                paint_figure(Color.Red, ref storag, indexin);
                 ++index;
 
             }
             p = 0;
         }
 
-        private int check_circle(ref Storage stg, int size, int x, int y)
+
+
+
+
+
+
+
+
+        private int check_figure(ref Storage stg, int size, int x, int y)
         {//проверка на наличие круга с координатами в хранилище
             if (stg.occupied(size) != 0)
             {
@@ -239,13 +283,20 @@ namespace lab_oop_6
                 {
                     if (!stg.check_empty(i))
                     {
-                        int x1 = stg.objects[i].x - 15;
-                        int x2 = stg.objects[i].x + 15;
-                        int y1 = stg.objects[i].y - 15;
-                        int y2 = stg.objects[i].y + 15;
-                        //если круг есть, возвращает индекс круга
-                        if ((x1 <= x && x <= x2) && (y1 <= y && y <= y2))
-                            return i;
+                        if (stg.objects[i] as Circle != null)
+                        {
+                            Circle circle = stg.objects[i] as Circle;
+                            if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
+                                return i;
+                        }
+                        else if (stg.objects[i] as Line != null)
+                        {
+                            Line line = stg.objects[i] as Line;
+                            if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
+                                return i;
+                        }
+
+
                     }
                 }
             }
@@ -258,7 +309,7 @@ namespace lab_oop_6
             {
                 if (!storag.check_empty(i))
                 {
-                    paint_circle(Color.Navy, ref storag, i);
+                    paint_figure(Color.Navy, ref storag, i);
                 }
             }
         }
@@ -274,10 +325,26 @@ namespace lab_oop_6
                 {
                     for (int i = 0; i < k; ++i)
                     {
-                        paint_circle(Color.Navy, ref storag, i);
+                        paint_figure(Color.Navy, ref storag, i);
                     }
                 }
             }
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            toolStripButton2.Checked = false;
+            figure_now = 1;
+            if (toolStripButton1.Checked == false) // Если не выбрана фигура
+                figure_now = 0;
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            toolStripButton1.Checked = false;
+            figure_now = 2;
+            if (toolStripButton2.Checked == false) // Если не выбрана фигура
+                figure_now = 0;
         }
     }
 }
