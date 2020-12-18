@@ -130,7 +130,7 @@ namespace lab_oop_6
 
         private void paint_figure(Color name, ref Storage stg, int index)
         {//рисуем круг на панели
-            Pen pen = new Pen(name, 3);
+            Pen pen = new Pen(name, 4);
             SolidBrush figurefillcolor;
             if (!stg.check_empty(index))
             {
@@ -144,17 +144,15 @@ namespace lab_oop_6
                     paint_box.CreateGraphics().FillEllipse(
                         figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
                 }
-                else 
-                {
-                    if (stg.objects[index] as Line != null)
-                    {   // Если в хранилище линия
-                        Line line = stg.objects[index] as Line;
-                        paint_box.CreateGraphics().DrawRectangle(pen, line.x,
-                                                line.y, line.lenght, line.wight);
-                        paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
-                            line.y, line.lenght, line.wight);
-                    }
+                else if (stg.objects[index] as Line != null)
+                {   // Если в хранилище линия
+                    Line line = stg.objects[index] as Line;
+                    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
+                                            line.y, line.lenght, line.wight);
+                    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
+                        line.y, line.lenght, line.wight);
                 }
+
             }
         }
 
@@ -257,15 +255,13 @@ namespace lab_oop_6
                             if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
                                 return i;
                         }
-                        else
+                        else if (stg.objects[i] as Line != null)
                         {
-                            if (stg.objects[i] as Line != null)
-                            {
-                                Line line = stg.objects[i] as Line;
-                                if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
-                                    return i;
-                            }
+                            Line line = stg.objects[i] as Line;
+                            if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
+                                return i;
                         }
+
 
 
                     }
@@ -300,6 +296,22 @@ namespace lab_oop_6
                     }
                 }
             }
+            if (e.KeyCode == Keys.Oemplus)
+            {   // Увеличиваем размер фигуры
+                changesize(ref storag, 10);
+                paint_box.Refresh();
+                for (int i = 0; i < k; ++i)
+                    if (!storag.check_empty(i))
+                        paint_figure(storag.objects[i].color, ref storag, i);
+            }
+            if (e.KeyCode == Keys.OemMinus)
+            {   // Уменьшаем размер фигуры
+                changesize(ref storag, -10);
+                paint_box.Refresh();
+                for (int i = 0; i < k; ++i)
+                    if (!storag.check_empty(i))
+                        paint_figure(storag.objects[i].color, ref storag, i);
+            }
         }
 
         private void drawellipse_Click(object sender, EventArgs e)
@@ -326,6 +338,34 @@ namespace lab_oop_6
                         paint_figure(storag.objects[i].color, ref storag, i);
                     }
             }
+
+
         }
+
+        private void changesize(ref Storage stg, int size)
+        {   // Увеличивает или уменьшает размер фигур, в зависимости от size
+            for (int i = 0; i < k; ++i)
+            {
+                if (!stg.check_empty(i))
+                {   // Если под i индексом в хранилище есть объект
+                    if (stg.objects[i].color == Color.Red)
+                    {
+                        if (stg.objects[i] as Circle != null)
+                        {   // Если в хранилище круг
+                            Circle circle = stg.objects[i] as Circle;
+                            circle.rad += size;
+                        }
+                        else if(stg.objects[i] as Line != null)
+                        {   // Если в хранилище отрезок
+                            Line line = stg.objects[i] as Line;
+                            line.lenght += size;
+                            //line.wight += size / 5;
+                        }
+
+                    }
+                }
+            }
+        }
+
     }
 }

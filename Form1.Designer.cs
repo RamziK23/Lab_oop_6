@@ -66,6 +66,7 @@
             this.drawellipse.Text = "Круг";
             this.drawellipse.UseVisualStyleBackColor = true;
             this.drawellipse.Click += new System.EventHandler(this.drawellipse_Click);
+            this.drawellipse.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // drawline
             // 
@@ -76,6 +77,7 @@
             this.drawline.Text = "Линия";
             this.drawline.UseVisualStyleBackColor = true;
             this.drawline.Click += new System.EventHandler(this.drawline_Click);
+            this.drawline.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // button_color
             // 
@@ -86,6 +88,7 @@
             this.button_color.Text = "Цвет";
             this.button_color.UseVisualStyleBackColor = true;
             this.button_color.Click += new System.EventHandler(this.button_color_Click);
+            this.button_color.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // Form1
             // 
