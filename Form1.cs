@@ -158,34 +158,6 @@ namespace lab_oop_6
             }
         }
 
-        //private void drawellipse_Click(object sender, EventArgs e)
-        //{
-        //    //drawline.Checked = false;
-        //    //figure_now = 1;
-        //    //if (drawellipse.Checked == false) // Если не выбрана фигура
-        //    //    figure_now = 0;
-        //}
-
-        //private void drawline_Click(object sender, EventArgs e)
-        //{
-        //    //drawellipse.Checked = false;
-        //    //figure_now = 2;
-        //    //if (drawline.Checked == false) // Если не выбрана фигура
-        //    //    figure_now = 0;
-        //}
-
-
-
-        private void button_deletestorage_Click(object sender, EventArgs e)
-        {
-            for (int i = 0; i < k; ++i)
-            {
-                storag.objects[i] = null;
-            }
-            index = 0;
-
-        }
-
         private void button_del__item_storage_Click(object sender, EventArgs e)
         {
             remove_selected_circle(ref storag);
@@ -212,14 +184,6 @@ namespace lab_oop_6
                 }
             }
         }
-
-
-
-
-
-
-
-
 
         private void paint_box_MouseClick(object sender, MouseEventArgs e)
         {
@@ -338,20 +302,30 @@ namespace lab_oop_6
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void drawellipse_Click(object sender, EventArgs e)
         {
-            toolStripButton2.Checked = false;
             figure_now = 1;
-            if (toolStripButton1.Checked == false) // Если не выбрана фигура
-                figure_now = 0;
         }
 
-        private void toolStripButton2_Click(object sender, EventArgs e)
+        private void drawline_Click(object sender, EventArgs e)
         {
-            toolStripButton1.Checked = false;
             figure_now = 2;
-            if (toolStripButton2.Checked == false) // Если не выбрана фигура
-                figure_now = 0;
+        }
+
+        private void button_color_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            button_color.BackColor = colorDialog1.Color;
+            for (int i = 0; i < k; ++i)
+            {
+                if (!storag.check_empty(i))
+                    if (storag.objects[i].color == Color.Red)
+                    {
+                        storag.objects[i].fillcolor = colorDialog1.Color;
+                        paint_figure(storag.objects[i].color, ref storag, i);
+                    }
+            }
         }
     }
 }
