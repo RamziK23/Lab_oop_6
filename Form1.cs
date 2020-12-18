@@ -32,7 +32,7 @@ namespace lab_oop_6
         class Circle : Figure
         {
             public int x, y; // Координаты круга
-            public int rad = 30; // Радиус круга
+            public int rad = 15; // Радиус круга
             public Circle(int x, int y)
             {
                 this.x = x - rad;
@@ -132,8 +132,9 @@ namespace lab_oop_6
         {//рисуем круг на панели
             Pen pen = new Pen(name, 3);
             SolidBrush figurefillcolor;
-            if (!storag.check_empty(index))
+            if (!stg.check_empty(index))
             {
+                stg.objects[index].color = name;
                 figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
                 if (storag.objects[index] as Circle != null)
                 {// Если в хранилище круг
@@ -143,13 +144,16 @@ namespace lab_oop_6
                     paint_box.CreateGraphics().FillEllipse(
                         figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
                 }
-                else if (stg.objects[index] as Line != null)
-                {   // Если в хранилище линия
-                    Line line = stg.objects[index] as Line;
-                    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
-                                            line.y, line.lenght, line.wight);
-                    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
-                        line.y, line.lenght, line.wight);
+                else 
+                {
+                    if (stg.objects[index] as Line != null)
+                    {   // Если в хранилище линия
+                        Line line = stg.objects[index] as Line;
+                        paint_box.CreateGraphics().DrawRectangle(pen, line.x,
+                                                line.y, line.lenght, line.wight);
+                        paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
+                            line.y, line.lenght, line.wight);
+                    }
                 }
             }
         }
@@ -199,11 +203,11 @@ namespace lab_oop_6
         {//удаляет выделенные элементы
             for (int i = 0; i < k; ++i)
             {
-                if (!storag.check_empty(i))
+                if (!stg.check_empty(i))
                 {
-                    if (storag.objects[i].color == Color.Red)
+                    if (stg.objects[i].color == Color.Red)
                     {
-                        storag.delete_object(i);
+                        stg.delete_object(i);
                     }
                 }
             }
@@ -220,7 +224,7 @@ namespace lab_oop_6
         private void paint_box_MouseClick(object sender, MouseEventArgs e)
         {
             //проверка на наличие круга на данных координатах
-            int c = check_figure(ref storag, k, e.X - 15, e.Y - 15);
+            int c = check_figure(ref storag, k, e.X, e.Y);
             if (index == k)
                 storag.increase(ref k);
             if (c != -1)
@@ -289,11 +293,14 @@ namespace lab_oop_6
                             if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
                                 return i;
                         }
-                        else if (stg.objects[i] as Line != null)
+                        else
                         {
-                            Line line = stg.objects[i] as Line;
-                            if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
-                                return i;
+                            if (stg.objects[i] as Line != null)
+                            {
+                                Line line = stg.objects[i] as Line;
+                                if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
+                                    return i;
+                            }
                         }
 
 
@@ -307,7 +314,7 @@ namespace lab_oop_6
         {//снимает выделение
             for (int i = 0; i < k; ++i)
             {
-                if (!storag.check_empty(i))
+                if (!stg.check_empty(i))
                 {
                     paint_figure(Color.Navy, ref storag, i);
                 }
@@ -317,7 +324,7 @@ namespace lab_oop_6
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {//кнопка Delete
-            if (e.KeyValue == (char)Keys.Delete)
+            if (e.KeyCode == Keys.Delete)
             {
                 remove_selected_circle(ref storag);
                 paint_box.Refresh();
